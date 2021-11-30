@@ -54,7 +54,6 @@
 class LiquidCrystal_I2C : public Print {
 public:
   LiquidCrystal_I2C();
-  void begin();
   void clear();
   void home();
   void noDisplay();
@@ -112,9 +111,6 @@ private:
   void command(uint8_t);
   void commandInit(uint8_t value);
   void send(uint8_t, uint8_t);
-/*
-  void send_plain(uint8_t value, uint8_t mode);
-*/
   void expanderWrite(uint8_t);
   void pulseEnable(uint8_t);
 
