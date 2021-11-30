@@ -22,13 +22,7 @@
 // can't assume that its in that state when a sketch starts (and the
 // LiquidCrystal constructor is called).
 
-LiquidCrystal_I2C::LiquidCrystal_I2C()
-{
-  _Addr = lcd_Addr;
-  _cols = lcd_cols;
-  _rows = lcd_rows;
-  _backlightval = LCD_NOBACKLIGHT;
-}
+LiquidCrystal_I2C::LiquidCrystal_I2C() { }
 
 void LiquidCrystal_I2C::oled_init(uint8_t lcd_Addr,uint8_t lcd_cols,uint8_t lcd_rows, uint8_t dotsize)
 {
@@ -38,6 +32,7 @@ void LiquidCrystal_I2C::oled_init(uint8_t lcd_Addr,uint8_t lcd_cols,uint8_t lcd_
 	_rows = lcd_rows;
 	_dotsize = dotsize;
 	_backlightval = LCD_NOBACKLIGHT;
+	_init();
 }
 
 void LiquidCrystal_I2C::init(uint8_t lcd_Addr,uint8_t lcd_cols,uint8_t lcd_rows, uint8_t dotsize)
@@ -47,7 +42,7 @@ void LiquidCrystal_I2C::init(uint8_t lcd_Addr,uint8_t lcd_cols,uint8_t lcd_rows,
 	_rows = lcd_rows;
 	_dotsize = dotsize;
 	_backlightval = LCD_NOBACKLIGHT;
-	_init_priv();
+	_init();
 }
 
 void LiquidCrystal_I2C::_init()
@@ -64,7 +59,7 @@ void LiquidCrystal_I2C::begin()
 	}
 
 	// for some 1 line displays you can select a 10 pixel high font
-	if ((_dotsize != 0) && (lines == 1)) {
+	if ((_dotsize != 0) && (_rows == 1)) {
 		_displayfunction |= LCD_5x10DOTS;
 	}
 
