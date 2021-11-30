@@ -22,7 +22,7 @@
 // can't assume that its in that state when a sketch starts (and the
 // LiquidCrystal constructor is called).
 
-LiquidCrystal_I2C::LiquidCrystal_I2C(uint8_t lcd_Addr,uint8_t lcd_cols,uint8_t lcd_rows)
+LiquidCrystal_I2C::LiquidCrystal_I2C()
 {
   _Addr = lcd_Addr;
   _cols = lcd_cols;
@@ -30,30 +30,41 @@ LiquidCrystal_I2C::LiquidCrystal_I2C(uint8_t lcd_Addr,uint8_t lcd_cols,uint8_t l
   _backlightval = LCD_NOBACKLIGHT;
 }
 
-void LiquidCrystal_I2C::oled_init(){
-  _oled = true;
-	init_priv();
+void LiquidCrystal_I2C::oled_init(uint8_t lcd_Addr,uint8_t lcd_cols,uint8_t lcd_rows, uint8_t dotsize)
+{
+	_oled = true;
+	_Addr = lcd_Addr;
+	_cols = lcd_cols;
+	_rows = lcd_rows;
+	_dotsize = dotsize;
+	_backlightval = LCD_NOBACKLIGHT;
 }
 
-void LiquidCrystal_I2C::init(){
-	init_priv();
+void LiquidCrystal_I2C::init(uint8_t lcd_Addr,uint8_t lcd_cols,uint8_t lcd_rows, uint8_t dotsize)
+{
+	_Addr = lcd_Addr;
+	_cols = lcd_cols;
+	_rows = lcd_rows;
+	_dotsize = dotsize;
+	_backlightval = LCD_NOBACKLIGHT;
+	_init_priv();
 }
 
-void LiquidCrystal_I2C::init_priv()
+void LiquidCrystal_I2C::_init()
 {
 	Wire.begin();
 	_displayfunction = LCD_4BITMODE | LCD_1LINE | LCD_5x8DOTS;
-	begin(_cols, _rows);  
+	begin();  
 }
 
-void LiquidCrystal_I2C::begin(uint8_t cols, uint8_t lines, uint8_t dotsize) {	// RK wird dotsize benötigt??
-	if (lines > 1) {
+void LiquidCrystal_I2C::begin()
+{
+	if (_rows > 1) {
 		_displayfunction |= LCD_2LINE;
 	}
-	_numlines = lines;
 
 	// for some 1 line displays you can select a 10 pixel high font
-	if ((dotsize != 0) && (lines == 1)) {
+	if ((_dotsize != 0) && (lines == 1)) {
 		_displayfunction |= LCD_5x10DOTS;
 	}
 
@@ -124,8 +135,8 @@ void LiquidCrystal_I2C::home(){
 
 void LiquidCrystal_I2C::setCursor(uint8_t col, uint8_t row){
 	int row_offsets[] = { 0x00, 0x40, 0x14, 0x54 };
-	if ( row > _numlines ) {
-		row = _numlines-1;    // we count rows starting w/0
+	if ( row > _rows ) {
+		row = _rows-1;    // we count rows starting w/0
 	}
 	command(LCD_SETDDRAMADDR | (col + row_offsets[row]));
 }
