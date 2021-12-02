@@ -117,6 +117,31 @@ inline size_t LiquidCrystal_I2C::write(uint8_t value) {
 	return 1;
 }
 
+/* ******** writes a NULL terminated string to the Display ****************** */
+inline size_t LiquidCrystal_I2C::writeString(char *value) {
+	return writeString(value, strlen(value));
+}
+
+/* ******** writes a string with length to the Display     ****************** */
+inline size_t LiquidCrystal_I2C::writeString(char *value, uint8_t length) {
+	uint8_t countChar = 0;
+	uint8_t countI2C = 0;
+	Wire.beginTransmission(_Addr);
+	while (countChar < length) {
+		pulseEnable((value[countChar]&0xF0)|Rs|_backlightval);			// send upper nibble
+		pulseEnable(((value[countChar]<<4)&0xF0)|Rs|_backlightval);		// send lower nibble
+		countChar++;													// select next character
+		countI2C++;														// count number of bytes to be transferred
+		if (countI2C >= (BUFFER_LENGTH>>2)) {							// if buffer will be exceeded on next characater, 4 bytes each character (4bit mode and EN High/Low)
+			Wire.endTransmission(false);								// write buffer to I2C display
+			Wire.beginTransmission(_Addr);								// and prepare a new transmission
+			countI2C = 0;												// start new Byte counting
+		}
+	}
+	Wire.endTransmission();
+	return (countChar -1);
+}
+
 void LiquidCrystal_I2C::clear(){
 	command(LCD_CLEARDISPLAY);// clear display, set cursor position to zero
 	delayMicroseconds(2000);  // this command takes a long time!	// RK hat HD44780 nicht
@@ -269,9 +294,9 @@ void LiquidCrystal_I2C::send(uint8_t value, uint8_t mode) {
 
 void LiquidCrystal_I2C::pulseEnable(uint8_t _data){
 	Wire.write(_data | En);			// En high
-	delayMicroseconds(1);			// enable pulse must be >450ns
+// enable pulse must be >450ns, next Byte via I2C will need 25us @ 400kHz
 	Wire.write(_data & ~En);		// En low
-	delayMicroseconds(50);			// commands need > 37us to settle
+// commands need > 37us to settle, next Byte via I2C will need ~40us (25us + processing time)
 } 
 
 // Alias functions
