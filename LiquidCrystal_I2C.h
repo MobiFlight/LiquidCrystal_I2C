@@ -82,6 +82,7 @@ public:
   void setCursor(uint8_t, uint8_t); 
   virtual size_t write(uint8_t);
   virtual size_t writeString(char*);
+  virtual size_t writeString(char*, uint8_t);
   void init(uint8_t lcd_Addr,uint8_t lcd_cols,uint8_t lcd_rows, uint8_t charsize = LCD_5x8DOTS);
   void oled_init(uint8_t lcd_Addr,uint8_t lcd_cols,uint8_t lcd_rows, uint8_t charsize = LCD_5x8DOTS);
 
