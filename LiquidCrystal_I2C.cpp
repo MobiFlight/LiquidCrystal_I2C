@@ -112,6 +112,7 @@ void LiquidCrystal_I2C::begin()
 
 /********** high level commands, for the user! */
 
+/* ******** writes a singel character to the Display     ******************** */
 inline size_t LiquidCrystal_I2C::write(uint8_t value) {
 	send(value, Rs);
 	return 1;
@@ -122,7 +123,7 @@ inline size_t LiquidCrystal_I2C::writeString(char *value) {
 	return writeString(value, strlen(value));
 }
 
-/* ******** writes a string with length to the Display     ****************** */
+/* ******** writes a string with defined length to the Display ************** */
 inline size_t LiquidCrystal_I2C::writeString(char *value, uint8_t length) {
 	uint8_t countChar = 0;
 	uint8_t countI2C = 0;
@@ -143,20 +144,20 @@ inline size_t LiquidCrystal_I2C::writeString(char *value, uint8_t length) {
 }
 
 void LiquidCrystal_I2C::clear(){
-	command(LCD_CLEARDISPLAY);// clear display, set cursor position to zero
-	delayMicroseconds(2000);  // this command takes a long time!	// RK hat HD44780 nicht
+	command(LCD_CLEARDISPLAY);											// clear display, set cursor position to zero
+	delayMicroseconds(2000);  											// this command takes a long time!
 	if (_oled) setCursor(0,0);
 }
 
 void LiquidCrystal_I2C::home(){
-	command(LCD_RETURNHOME);  // set cursor position to zero
-	delayMicroseconds(2000);  // this command takes a long time!	// RK hat HD44780 nicht
+	command(LCD_RETURNHOME);  											// set cursor position to zero
+	delayMicroseconds(2000);  											// this command takes a long time!
 }
 
 void LiquidCrystal_I2C::setCursor(uint8_t col, uint8_t row){
 	int row_offsets[] = { 0x00, 0x40, 0x14, 0x54 };
 	if ( row > _rows ) {
-		row = _rows-1;    // we count rows starting w/0
+		row = _rows-1;    												// we count rows starting w/0
 	}
 	command(LCD_SETDDRAMADDR | (col + row_offsets[row]));
 }
@@ -284,7 +285,7 @@ inline void LiquidCrystal_I2C::commandInit(uint8_t value) {
 	Wire.endTransmission();
 }
 
-// write either command or data
+// write single Byte either command or data
 void LiquidCrystal_I2C::send(uint8_t value, uint8_t mode) {
 	Wire.beginTransmission(_Addr);
 	pulseEnable((value&0xF0)|mode|_backlightval);
@@ -295,8 +296,10 @@ void LiquidCrystal_I2C::send(uint8_t value, uint8_t mode) {
 void LiquidCrystal_I2C::pulseEnable(uint8_t _data){
 	Wire.write(_data | En);			// En high
 // enable pulse must be >450ns, next Byte via I2C will need 25us @ 400kHz
+// no delay is required as processing time is bigger than 450ns
 	Wire.write(_data & ~En);		// En low
-// commands need > 37us to settle, next Byte via I2C will need ~40us (25us + processing time)
+// commands need > 37us to settle, next 2 Byte via I2C will need ~55us @ 400kHz (25us per Byte plus start/stop condition)
+// no delay is required as processing time is bigger than 37us
 } 
 
 // Alias functions
@@ -323,9 +326,9 @@ void LiquidCrystal_I2C::load_custom_character(uint8_t char_num, uint8_t *rows){
 
 void LiquidCrystal_I2C::setBacklight(uint8_t new_val){
 	if(new_val){
-		backlight();		// turn backlight on
+		backlight();													// turn backlight on
 	}else{
-		noBacklight();		// turn backlight off
+		noBacklight();													// turn backlight off
 	}
 }
 
