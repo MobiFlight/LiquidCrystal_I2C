@@ -3,6 +3,9 @@
 #define LiquidCrystal_I2C_h
 
 #include <Wire.h>
+#if defined(ARDUINO_ARCH_RP2040)
+  #define BUFFER_LENGTH WIRE_BUFFER_SIZE
+#endif
 
 // commands
 #define LCD_CLEARDISPLAY    0x01
